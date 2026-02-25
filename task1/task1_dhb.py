@@ -49,7 +49,7 @@ def interval(a, b):
 
 allowed = {
     "wm": interval(17, 22),                 
-    "dw": interval(6, 7) | interval(19, 23),# morning + evening, avoid dinnertime 17-19
+    "dw": interval(6, 7) | interval(19, 23),# morning + evening, avoid dinnertime 17-19, ehm sjekk ut denne... 23
     "ev": interval(17, 24) | interval(1,2)             
 }
 
