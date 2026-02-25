@@ -32,6 +32,7 @@ gamma_max = {
     "ev": 3.6,
 }
 
+# SLETT????????????? VISS ME Kun bruke intervals
 # allowed operation windows (setup time alpha, deadline beta)
 # note: wrap-around windows are represented by a set of allowed hours
 def allowed_hours(alpha, beta):
@@ -49,7 +50,7 @@ def interval(a, b):
 allowed = {
     "wm": interval(17, 22),                 
     "dw": interval(6, 7) | interval(19, 23),# morning + evening, avoid dinnertime 17-19
-    "ev": allowed_hours(17, 6),             # wrap over midnight
+    "ev": interval(17, 24) | interval(1,2)             
 }
 
 # -----------------------------
