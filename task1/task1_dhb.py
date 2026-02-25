@@ -41,10 +41,15 @@ def allowed_hours(alpha, beta):
         return set(range(alpha, beta + 1))
     return set(range(alpha, 25)) | set(range(1, beta + 1))
 
+
+# helper for a plain inclusive interval
+def interval(a, b):
+    return set(range(a, b + 1))
+
 allowed = {
-    "wm": allowed_hours(17, 21),  # 17-21
-    "dw": allowed_hours(19, 17),  # 19-17 (wraps over midnight)
-    "ev": allowed_hours(17, 6),   # 17-06 (wraps over midnight)
+    "wm": interval(17, 22),                 
+    "dw": interval(6, 7) | interval(19, 23),# morning + evening, avoid dinnertime 17-19
+    "ev": allowed_hours(17, 6),             # wrap over midnight
 }
 
 # -----------------------------
