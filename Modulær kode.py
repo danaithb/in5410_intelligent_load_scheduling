@@ -1,33 +1,67 @@
 import pulp
 import pandas as pd
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+driver = webdriver.Chrome()
+driver.get("https://data.nordpoolgroup.com/auction/day-ahead/prices?deliveryDate=2026-02-27&currency=EUR&aggregation=DeliveryPeriod&deliveryAreas=NO1")
+
+
+try:
+    # 1. Vent på at tabellen i det hele tatt dukker opp
+    wait = WebDriverWait(driver, 20)
+    
+    # Vi prøver en enklere X-Path: 
+    # Finn en 'td' som er den andre cellen (aria-colindex=2) i sin rad
+    xpath_forsok = "//td[@aria-colindex='2']"
+    
+    print("Leter etter prisen...")
+    pris_elementer = wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath_forsok)))
+
+    # Siden det er mange rader, velger vi rad 7 (som i din opprinnelige sti)
+    # Husk: Python starter på 0, så rad 7 er indeks 6
+    valgt_pris = pris_elementer[6].text
+    
+    print(f"Suksess! Fant verdien: {valgt_pris}")
+
+except Exception as e:
+    print("Klarte fortsatt ikke finne elementet.")
+    # Dette vil printe den faktiske HTML-koden til siden så vi kan feilsøke
+    # print(driver.page_source[:500])
+
 # 1. OPPSETT AV DATA
 timer = list(range(24))
 # Eksempel på strømpriser (dyrt kl 08-20)
-priser = [101.2575,
-100.88,
-100.455,
-100.2,
-100.9925,
-103.2525,
-129.195,
-218.3675,
-352.6125,
-226.025,
-165.2725,
-134.2075,
-119.54,
-110.51,
-109,
-116.5925,
-122.525,
-151.2225,
-129.1175,
-119.545,
-119.5425,
-110.8525,
-101.3875,
-95.085]
+
+priser = {t: 1 if 17 <= t <= 20 else 0.5 for t in timer} # Priser er
+
+#priser = [101.2575,
+#100.88,
+#100.455,
+#100.2,
+#100.9925,
+#103.2525,
+#129.195,
+#218.3675,
+#352.6125,
+#226.025,
+#165.2725,
+#134.2075,
+#119.54,
+#110.51,
+#109,
+#116.5925,
+#122.525,
+#151.2225,
+#129.1175,
+#119.545,
+#119.5425,
+#110.8525,
+#101.3875,
+#95.085]
 
 
 MAKS_HUS_EFFEKT = 6.0 # Maks kW totalt i huset per time
@@ -43,7 +77,7 @@ apparater = {}
 
 for _, row in df.iterrows():
     apparater[row['navn']] = {
-        "p": float(row['p']),
+        "p": float(row['p'])/int(row['d']),
         "d": int(row['d']),
         "vindu": (int(row['vindu_start']), int(row['vindu_slutt'])),
         "kan_pauses": bool(row['kan_pauses']),
@@ -138,5 +172,5 @@ for t in timer:
 
 print("=" * 50)
 # Her henter vi ut totalprisen fra objektfunksjonen
-print(f"TOTALPRIS FOR DØGNET: {pulp.value(prob.objective):.2f} øre")
+print(f"TOTALPRIS FOR DØGNET: {pulp.value(prob.objective):.2f} kr")
 print("=" * 50)
