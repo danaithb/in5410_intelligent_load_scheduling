@@ -1,26 +1,26 @@
 import pulp
 import pandas as pd
-#import Collect_prices #Saves electricity prices from Nordpool to an Excel file
-import os #Will be used to ensure compatbility across different operating systems when loading files
-
-quarters = list(range(192))
-#Makes a list kontaining a number corresponging to all the quearters in a two day period
-#A two day period is used to ensure that prosesses may carry on overnight
-#To ensure that a the opimization cannot plant one process on the morning of the current day, and anotherone omn the morning of the following day the constraint from excel are made to never move past 10 oclock
-#The list entries falling outside of this range is therefore redundant, but its currently the best solution we can manage
-
-
-#Task1
-#prices_path = os.path.join("data", "Prices_task1.xlsx")
-
-#Task2-->
-prices_path = os.path.join("data", "PricesNP.xlsx")
+import Collect_prices #Saves electricity prices from Nordpool to an Excel file
+import os #Will be used to ensure compatibility across different operating systems when loading files
 
 ##########
-# For task 1, make sure that all prices are in Norwegian øre and that the correct excel file is given
-########## 
-df_prices = pd.read_excel(prices_path, header=None)
+# Set TASK to 1, 2, 3 or 4 to run the corresponding task
+##########
+TASK = 4
 
+quarters = list(range(192))
+
+if TASK == 1:
+    prices_path = os.path.join("data", "Prices_task1.xlsx")
+    appliences_path = os.path.join("data", "appliances_1.xlsx")
+elif TASK == 3:
+    prices_path = os.path.join("data", "PricesNP.xlsx")
+    appliences_path = os.path.join("data", "appliances_3.xlsx")
+else:  # Task 2 and 4
+    prices_path = os.path.join("data", "PricesNP.xlsx")
+    appliences_path = os.path.join("data", "appliances_2_4.xlsx")
+
+df_prices = pd.read_excel(prices_path, header=None)
 
 prices = df_prices.iloc[:, 1].tolist()
 
@@ -29,12 +29,6 @@ prices = df_prices.iloc[:, 1].tolist()
 ###################
 L = 10/4 #Provides the maximum possible capacity for a single quarter
 #This should be expanded to "nettleige" and introduced as part of the objective function
-
-
-
-#appliences_path = os.path.join("data", "appliances_1.xlsx")
-appliences_path = os.path.join("data", "appliances_2_4.xlsx")
-#appliences_path = os.path.join("data", "appliances_3.xlsx")
 
 df_appliences = pd.read_excel(appliences_path)
     
@@ -132,16 +126,16 @@ for a, info in appliences.items():
 
 
 
-#Include for task 4
-#Contraint for maximum usage at any given time
-for t in quarters:
-    time_last = []
-    for a, info in appliences.items():
-        if info['Adjustable']:
-            time_last.append(effect[a][t])
-        else:
-            time_last.append(active[a][t] * info['p'])
-    problem += pulp.lpSum(time_last) <= L
+#Contraint for maximum usage at any given time - only active for task 4
+if TASK == 4:
+    for t in quarters:
+        time_last = []
+        for a, info in appliences.items():
+            if info['Adjustable']:
+                time_last.append(effect[a][t])
+            else:
+                time_last.append(active[a][t] * info['p'])
+        problem += pulp.lpSum(time_last) <= L
 
 
 
