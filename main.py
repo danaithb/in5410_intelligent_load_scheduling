@@ -1,6 +1,6 @@
 import pulp
 import pandas as pd
-import Collect_prices #Saves electricity prices from Nordpool to an Excel file
+#import Collect_prices #Saves electricity prices from Nordpool to an Excel file
 import os #Will be used to ensure compatbility across different operating systems when loading files
 
 quarters = list(range(192))
@@ -9,6 +9,11 @@ quarters = list(range(192))
 #To ensure that a the opimization cannot plant one process on the morning of the current day, and anotherone omn the morning of the following day the constraint from excel are made to never move past 10 oclock
 #The list entries falling outside of this range is therefore redundant, but its currently the best solution we can manage
 
+
+#Task1
+#prices_path = os.path.join("data", "Prices_task1.xlsx")
+
+#Task2-->
 prices_path = os.path.join("data", "PricesNP.xlsx")
 
 ##########
@@ -22,12 +27,15 @@ prices = df_prices.iloc[:, 1].tolist()
 ###################
 #Provide a reasonable capacity here
 ###################
-L = 6.0 #Provides the maximum possible capacity for a single quarter
+L = 10/4 #Provides the maximum possible capacity for a single quarter
 #This should be expanded to "nettleige" and introduced as part of the objective function
 
 
 
-appliences_path = os.path.join("data", "appliances.xlsx")
+#appliences_path = os.path.join("data", "appliances_1.xlsx")
+appliences_path = os.path.join("data", "appliances_2_4.xlsx")
+#appliences_path = os.path.join("data", "appliances_3.xlsx")
+
 df_appliences = pd.read_excel(appliences_path)
     
 
@@ -37,7 +45,7 @@ appliences = {}
 
 for _, row in df_appliences.iterrows():
 
-    window_string = str(row['vindu']) 
+    window_string = str(row['window_slots']) 
     intervals = []
     for part in window_string.split(','):
         s, e = part.split('-')
@@ -47,12 +55,12 @@ for _, row in df_appliences.iterrows():
 #Må oppdatera desse te engelsk når excel e klart, hugså å oppdatere gjennom heile koden
 ###################
 
-    appliences[row['navn']] = {
-        "p": float(row['p'])/int(row['d']),
-        "d": int(row['d']),
-        "vinduer": intervals, 
-        "kan_pauses": bool(row['kan_pauses']),
-        "kan_justeres": bool(row['kan_justeres'])
+    appliences[row['appliances']] = {
+        "p": float(row['energy_kwh'])/int(row['duration_slots']),
+        "d": int(row['duration_slots']),
+        "windows": intervals, 
+        "Pausable": bool(row['can_pause']),
+        "Adjustable": bool(row['can_adjust'])
     }
 
 
@@ -75,7 +83,7 @@ effect = pulp.LpVariable.dicts("effect", (appliences.keys(), quarters), lowBound
 total_cost = []
 for a, info in appliences.items():
     for t in quarters:
-        if info['kan_justeres']:
+        if info['Adjustable']:
             total_cost.append(effect[a][t] * prices[t]) #uses the current effect
         else:
             total_cost.append(active[a][t] * info['p'] * prices[t])
@@ -88,7 +96,7 @@ for a, info in appliences.items():
     for t in quarters:
         
         legal = False
-        for (v_start, v_slutt) in info['vinduer']:
+        for (v_start, v_slutt) in info['windows']:
             if v_start <= t < v_slutt:
                 legal = True
                 break
@@ -101,7 +109,7 @@ for a, info in appliences.items():
 
 
     #adjustable effect
-    if info['kan_justeres']:
+    if info['Adjustable']:
         
         total_energy_requirement = info['p'] * info['d'] #this simply returs the original p as it was divided by d in the making of the list
         problem += pulp.lpSum([effect[a][t] for t in quarters]) == total_energy_requirement
@@ -111,7 +119,7 @@ for a, info in appliences.items():
 
 
     
-    elif info['kan_pauses']:
+    elif info['Pausable']:
         problem += pulp.lpSum([active[a][t] for t in quarters]) == info['d']
 
     #Cannot be paused or adjusted
@@ -124,11 +132,12 @@ for a, info in appliences.items():
 
 
 
+#Include for task 4
 #Contraint for maximum usage at any given time
 for t in quarters:
     time_last = []
     for a, info in appliences.items():
-        if info['kan_justeres']:
+        if info['Adjustable']:
             time_last.append(effect[a][t])
         else:
             time_last.append(active[a][t] * info['p'])
@@ -150,7 +159,7 @@ for t in quarters:
 
     for a in appliences:
         
-        if appliences[a]['kan_justeres']:
+        if appliences[a]['Adjustable']:
             value_print = pulp.value(effect[a][t])
         else:
             value_print = pulp.value(active[a][t]) * appliences[a]['p']
@@ -160,5 +169,5 @@ for t in quarters:
     print(line)
 
 print("=" * 50)
-print(f"Electricitybill comes to: {pulp.value(problem.objective)/100:.2f} NOK") #Adjusts prices normally given in øre to Nok
+print(f"Electricitybill comes to: {pulp.value(problem.objective)/100:.4f} NOK") #Adjusts prices normally given in øre to Nok
 print("=" * 50)
