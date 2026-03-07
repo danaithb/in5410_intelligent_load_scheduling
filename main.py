@@ -3,9 +3,8 @@ import pandas as pd
 import Collect_prices #Saves electricity prices from Nordpool to an Excel file
 import os #Will be used to ensure compatibility across different operating systems when loading files
 
-##########
-# Set TASK to 1, 2, 3 or 4 to run the corresponding task
-##########
+
+# Prompt the user to choose a task (1-4) or exit
 def choose_task():
     while True:
         choice = input("Which task do you want to run? Choose between 1-4, or write q to exit: ").strip().lower()
