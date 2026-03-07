@@ -6,7 +6,19 @@ import os #Will be used to ensure compatibility across different operating syste
 ##########
 # Set TASK to 1, 2, 3 or 4 to run the corresponding task
 ##########
-TASK = 4
+def choose_task():
+    while True:
+        choice = input("Which task do you want to run? Choose between 1-4, or write q to exit: ").strip().lower()
+        if choice in {"1", "2", "3", "4"}:
+            return int(choice)
+        if choice == "q":
+            return "q"
+        print("Invalid choice. Please enter 1, 2, 3, 4, or q")
+
+TASK = choose_task()
+if TASK == "q":
+    print("Exiting program..")
+    quit()
 
 quarters = list(range(192))
 
