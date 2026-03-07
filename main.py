@@ -27,16 +27,17 @@ quarters = list(range(192))
 if TASK == 1:
     prices_path = os.path.join("data", "Prices_task1.xlsx")
     appliences_path = os.path.join("data", "appliances_1.xlsx")
-elif TASK == 3:
-  #  prices_path = os.path.join("data", "PricesNP.xlsx")
-    appliences_path = os.path.join("data", "appliances_3.xlsx")
-else:  # Task 2 and 4
-   # prices_path = os.path.join("data", "PricesNP.xlsx")
-    appliences_path = os.path.join("data", "appliances_2_4.xlsx")
 
-df_prices = pd.read_excel(prices_path, header=None)
+    df_prices = pd.read_excel(prices_path, header=None)
+    prices = df_prices.iloc[:, 1].tolist()
 
-prices = df_prices.iloc[:, 1].tolist()
+else:
+    if TASK == 3:
+        appliences_path = os.path.join("data", "appliances_3.xlsx")
+    else: #task 2 and 4
+        appliences_path = os.path.join("data", "appliances_2_4.xlsx")
+
+    prices_hourly = generate_hourly_prices()
 
 ###################
 #Provide a reasonable capacity here
