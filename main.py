@@ -19,7 +19,7 @@ def choose_task():
 
 TASK = choose_task()
 if TASK == "q":
-    print("Exiting program..")
+    print("Exiting program.. have a nice day :)")
     quit()
 
 quarters = list(range(192))
@@ -37,7 +37,11 @@ else:
     else: #task 2 and 4
         appliences_path = os.path.join("data", "appliances_2_4.xlsx")
 
-    prices_hourly = generate_hourly_prices()
+    prices_hourly = generate_hourly_prices() + generate_hourly_prices()
+
+    prices = []
+    for p in prices_hourly:
+        prices.extend([p] * 4)
 
 ###################
 #Provide a reasonable capacity here
@@ -164,7 +168,9 @@ print(f"{'Time':<17} {'Apparat Forbruk (kW)':<40}")
 print("-" * 50)
 
 for t in quarters:
-    line = f"Kl {df_prices.iloc[t, 0]}:   "
+    hour = (t // 4) % 24
+    minute = (t % 4) * 15
+    line = f"Kl {hour:02d}:{minute:02d}:   "
 
     for a in appliences:
         
