@@ -1,7 +1,9 @@
 import pulp
 import pandas as pd
-import os
+#import Collect_prices #Saves electricity prices from Nordpool to an Excel file
+import os #Will be used to ensure compatibility across different operating systems when loading files
 from Price_curve_generator import generate_hourly_prices
+
 
 ###################
 # Prompt the user to choose a task (1-4) or exit
@@ -20,33 +22,21 @@ if TASK == "q":
     print("Exiting program..")
     quit()
 
-# One day with 15-minute slots
-quarters = list(range(96))
+quarters = list(range(192))
 
 if TASK == 1:
     prices_path = os.path.join("data", "Prices_task1.xlsx")
     appliences_path = os.path.join("data", "appliances_1.xlsx")
+elif TASK == 3:
+  #  prices_path = os.path.join("data", "PricesNP.xlsx")
+    appliences_path = os.path.join("data", "appliances_3.xlsx")
+else:  # Task 2 and 4
+   # prices_path = os.path.join("data", "PricesNP.xlsx")
+    appliences_path = os.path.join("data", "appliances_2_4.xlsx")
 
-    df_prices = pd.read_excel(prices_path, header=None)
-    prices = df_prices.iloc[:, 1].tolist()
+df_prices = pd.read_excel(prices_path, header=None)
 
-else:  # Task 2, 3 and 4
-    if TASK == 3:
-        appliences_path = os.path.join("data", "appliances_3.xlsx")
-    else:
-        appliences_path = os.path.join("data", "appliances_2_4.xlsx")
-
-    prices_hourly = generate_hourly_prices()
-
-    prices = []
-    for p in prices_hourly:
-        prices.extend([p] * 4)
-
-    df_generated = pd.DataFrame({
-        "hour": list(range(24)),
-        "price": prices_hourly
-    })
-    df_generated.to_excel("data/generated_RTP_prices.xlsx", index=False)
+prices = df_prices.iloc[:, 1].tolist()
 
 ###################
 #Provide a reasonable capacity here
