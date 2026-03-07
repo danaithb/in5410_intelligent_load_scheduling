@@ -48,9 +48,9 @@ def interval(a, b):
     return set(range(a, b + 1))
 
 allowed = {
-    "wm": interval(17, 22),                 
-    "dw": interval(6, 7) | interval(19, 23),# morning + evening, avoid dinnertime 17-19, ehm sjekk ut denne... 23
-    "ev": interval(17, 24) | interval(1,2)             
+    "wm": interval(17, 22),  # 22 so they can hang up clothes before bedtime       
+    "dw": interval(6, 7) | interval(19, 23),# morning + evening, avoid dinnertime 17-19
+    "ev": interval(17, 24) | interval(1,2)  # max 2 so the charging doesnt start after bedtime      
 }
 
 # -----------------------------
