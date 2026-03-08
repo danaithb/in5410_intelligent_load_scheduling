@@ -1,31 +1,41 @@
 # IN5410 - Intelligent Load Scheduling
 
-## Running the tasks
+## Running the program
 
-All tasks are run by setting the `TASK` variable at the top of `main.py` to the desired task number, then running the file:
+Run the program with:
 
-```python
-TASK = 4  # Change to 1, 2, 3 or 4
-```
+python main.py
 
-The correct price file, appliance file, and constraints are selected automatically based on `TASK`.
+You will be prompted to choose which task to run (1–4) or exit the program.
 
-### Files per task
+## Using Nord Pool prices (optional)
 
-| Task | Price file                 | Appliance file               |
-|------|----------------------------|------------------------------|
-| 1    | `data/Prices_task1.xlsx`   | `data/appliances_1.xlsx`     |
-| 2    | `data/PricesNP.xlsx`       | `data/appliances_2_4.xlsx`   |
-| 3    | `data/PricesNP.xlsx`       | `data/appliances_3.xlsx`     |
-| 4    | `data/PricesNP.xlsx`       | `data/appliances_2_4.xlsx`   |
+If you want to run the model with Nord Pool prices:
 
+1. Run the script that collects prices:
 
-## Live electricity prices (tasks 2-4)
+python Collect_prices.py
 
-For tasks 2-4, electricity prices are fetched live from Nordpool.
+2. This will save the prices to:
+
+data/PricesNP.xlsx
+
+3. Modify `main.py` so that tasks 2–4 read prices from this file instead of using generated prices.
+
+## Files per task
+
+| Task | Price source                         | Appliance file           |
+| ---- | ------------------------------------ | ------------------------ |
+| 1    | data/Prices_task1.xlsx               | data/appliances_1.xlsx   |
+| 2    | Generated price curve                | data/appliances_2_4.xlsx |
+| 3    | Generated price curve                | data/appliances_3.xlsx   |
+| 4    | Same generated price curve as Task 2 | data/appliances_2_4.xlsx |
+
+Task 1 uses prices from an Excel file.  
+Tasks 2–4 use a generated electricity price curve.
 
 ## Dependencies
 
-```
+Install required packages:
+
 pip install pulp pandas openpyxl
-```
