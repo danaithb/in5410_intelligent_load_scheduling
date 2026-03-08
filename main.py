@@ -2,27 +2,53 @@ import pulp
 import pandas as pd
 #import Collect_prices #Saves electricity prices from Nordpool to an Excel file
 import os #Will be used to ensure compatibility across different operating systems when loading files
+from Price_curve_generator import generate_hourly_prices
 
+<<<<<<< HEAD
 ##########
 # Set TASK to 1, 2, 3 or 4 to run the corresponding task
 ##########
 TASK = 2
+=======
+
+###################
+# Prompt the user to choose a task (1-4) or exit
+###################
+def choose_task():
+    while True:
+        choice = input("Which task do you want to run? Choose between 1-4, or write q to exit: ").strip().lower()
+        if choice in {"1", "2", "3", "4"}:
+            return int(choice)
+        if choice == "q":
+            return "q"
+        print("Invalid choice. Please enter 1, 2, 3, 4, or q")
+
+TASK = choose_task()
+if TASK == "q":
+    print("Exiting program.. have a nice day :)")
+    quit()
+>>>>>>> 37ab9395babab7f1dd4bdce06f2ffbac0b809608
 
 quarters = list(range(192))
 
 if TASK == 1:
     prices_path = os.path.join("data", "Prices_task1.xlsx")
     appliences_path = os.path.join("data", "appliances_1.xlsx")
-elif TASK == 3:
-    prices_path = os.path.join("data", "PricesNP.xlsx")
-    appliences_path = os.path.join("data", "appliances_3.xlsx")
-else:  # Task 2 and 4
-    prices_path = os.path.join("data", "PricesNP.xlsx")
-    appliences_path = os.path.join("data", "appliances_2_4.xlsx")
 
-df_prices = pd.read_excel(prices_path, header=None)
+    df_prices = pd.read_excel(prices_path, header=None)
+    prices = df_prices.iloc[:, 1].tolist()
 
-prices = df_prices.iloc[:, 1].tolist()
+else:
+    if TASK == 3:
+        appliences_path = os.path.join("data", "appliances_3.xlsx")
+    else: #task 2 and 4
+        appliences_path = os.path.join("data", "appliances_2_4.xlsx")
+
+    prices_hourly = generate_hourly_prices() + generate_hourly_prices()
+
+    prices = []
+    for p in prices_hourly:
+        prices.extend([p] * 4)
 
 ###################
 #Provide a reasonable capacity here
@@ -149,7 +175,9 @@ print(f"{'Time':<17} {'Apparat Forbruk (kW)':<40}")
 print("-" * 50)
 
 for t in quarters:
-    line = f"Kl {df_prices.iloc[t, 0]}:   "
+    hour = (t // 4) % 24
+    minute = (t % 4) * 15
+    line = f"Kl {hour:02d}:{minute:02d}:   "
 
     for a in appliences:
         
