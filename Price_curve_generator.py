@@ -1,7 +1,7 @@
 import random
 import math
 
-def generate_hourly_prices(base_price=50, volatility=10):
+def generate_hourly_prices(base_price=75, volatility=10):
     """
     Generates a list of 24 hourly electricity prices in $/MWh.
     

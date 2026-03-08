@@ -1,12 +1,12 @@
 import pulp
 import pandas as pd
-import Collect_prices #Saves electricity prices from Nordpool to an Excel file
+#import Collect_prices #Saves electricity prices from Nordpool to an Excel file
 import os #Will be used to ensure compatibility across different operating systems when loading files
 
 ##########
 # Set TASK to 1, 2, 3 or 4 to run the corresponding task
 ##########
-TASK = 4
+TASK = 2
 
 quarters = list(range(192))
 
